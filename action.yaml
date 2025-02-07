@@ -1,35 +1,120 @@
-name: 'Hello World'
-description: 'Greet someone'
+name: 'Mirror to Radicle'
+description: 'A GitHub Action that mirrors your code to the Radicle peer-to-peer code hosting network.'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  radicle-identity-passphrase:
+    description: 'The passphrase you used when creating the Radicle identity keypair. (When you ran `rad auth`) '
     required: true
-    default: 'World'
-outputs:
-  random-number:
-    description: "Random number"
-    value: ${{ steps.random-number-generator.outputs.random-number }}
+    default: ''
+  radicle-identity-alias:
+    description: 'An alias for your Radicle identity. Used to indicate what this key is used for.'
+    required: true
+    default: ''
+  radicle-identity-private-key:
+    description: 'The private key for the _machine account_ you created for GitHub Actions to use, in order to sign and push code from GitHub -> Radicle.'
+    required: true
+    default: ''
+  radicle-identity-public-key:
+    description: 'The private key for the _machine account_ you created for GitHub Actions to use, in order to sign and push code from GitHub -> Radicle.'
+    required: true
+    default: ''
+  radicle-repository-id:
+    description: 'The `repository id` of the repository you created on Radicle, when you ran `rad init`. You can find the repo id by switching to the folder of your radicle project and running `rad .`.'
+    required: true
+    default: ''
+  radicle-project-name:
+    description: 'The `xyz.radicle.project.name` found in your repository payload. You can see this by switching to the folder of your radicle project and running `rad inspect --payload`'
+    required: true
+    default: ''
 runs:
   using: "composite"
   steps:
-    - name: Set Greeting
-      run: echo "Hello $INPUT_WHO_TO_GREET."
-      shell: bash
-      env:
-        INPUT_WHO_TO_GREET: ${{ inputs.who-to-greet }}
-
-    - name: Random Number Generator
-      id: random-number-generator
-      run: echo "random-number=$(echo $RANDOM)" >> $GITHUB_OUTPUT
-      shell: bash
-
     - name: Set GitHub Path
       run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
       shell: bash
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
 
-    - name: Run goodbye.sh
-      run: goodbye.sh
-      shell: bash
+    - name: Install radicle-cli
+      env:
+        RAD_HOME: ${{ github.workspace }}/.radicle
+      run: |
+        curl --show-error --silent --fail https://radicle.xyz/install | sh
+        echo "RAD_HOME=${{ github.workspace }}/.radicle" >> $GITHUB_ENV
+        echo "RAD_PASSPHRASE=${{ inputs.radicle-identity-passphrase }}" >> $GITHUB_ENV
+        echo "${RAD_HOME}/bin" >> $GITHUB_PATH
+
+    - name: Install helper packages
+      run: |
+        sudo apt-get -y install socat
+
+    - name: Setup Radicle Identity & Node
+      run: |          
+        echo "Home: $HOME"
+        rad --version          
+        rad config init --alias "${{ inputs.radicle-identity-alias}}"
+        echo "${{ inputs.radicle-identity-private-key }}" | base64 --decode > ${{ github.workspace }}/.radicle/keys/radicle
+        echo "${{ inputs.radicle-identity-public-key }}" | base64 --decode > ${{ github.workspace }}/.radicle/keys/radicle.pub
+        rad auth 
+
+    - name: Start Radicle Node
+      run: |          
+        rad config unset preferredSeeds
+        rad config 
+        
+        rad node start
+        
+        echo "Waiting for node to start"
+        max_retry=30
+        counter=0
+        until echo '{"command": "sessions"}' | socat - UNIX-CONNECT:${{ github.workspace }}/.radicle/node/control.sock
+        do
+           sleep 1
+           [[ counter -eq $max_retry ]] && echo "Failed" && break 
+           echo "Waiting for node to start... $counter"
+           counter=$((counter+1))
+        done
+
+    - name: Wait for Node to connect to peers
+      run: |          
+        max_retry=30
+        counter=0
+        until echo '{"command": "sessions"}' | socat - UNIX-CONNECT:${{ github.workspace }}/.radicle/node/control.sock | grep '"state":{"connected"'
+        do
+           sleep 1
+           [[ counter -eq $max_retry ]] && echo "Failed" && break 
+           echo "Waiting for node to connect... $counter"
+           counter=$((counter+1))
+        done
+        
+        rad node status
+
+
+
+    - name: Clone from Radicle
+      run: |
+        rad clone "${{ inputs.radicle-repository-id }}" --no-confirm
+
+    - name: Fetch code from GitHub
+      working-directory: ${{ github.workspace }}/${{ inputs.radicle-project-name }}
+      run: |
+        
+        export GH_REPO_URL=$( echo "${{ github.repositoryUrl }}" \
+          | sed -e 's/git:\/\//https:\/\//g'
+        )
+
+        git remote add github ${GH_REPO_URL}
+        git remote -v
+        git fetch --all
+        git checkout -b ${{ github.ref_name }} --track github/${{ github.ref_name }}
+        
+
+    - name: Push to Radicle Network
+      working-directory: ${{ github.workspace }}/${{ inputs.radicle-project-name }}
+      run: |
+        git push rad ${{ github.ref_name }}
+        
+        echo "Ensuring sync with the network"
+        rad sync --announce
+        
+        rad node stop
 
