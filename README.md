@@ -119,10 +119,12 @@ ahead and announce your project!
 > can rest assured that your project will be available to everyone else on the
 > network. The more permissive nodes there are, the greater the resilience and
 > availability of your project will be.
-
-If you don't want / can't rely on permissive nodes, you can also [run your own
+> 
+>If you don't want / can't rely on permissive nodes, you can also [run your own
 seed node](https://radicle.xyz/guides/seeder#running-your-node) to ensure
 your project remains seeded.
+
+Here is how to initialise your Radicle project and announce it to the network:
 
 ```shell
 $ git clone https://github.com/gsaslis/mirror-to-radicle
