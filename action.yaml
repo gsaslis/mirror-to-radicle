@@ -119,7 +119,7 @@ runs:
       shell: bash
       working-directory: ${{ github.workspace }}/${{ inputs.radicle-project-name }}
       run: |
-        git push rad ${{ github.ref_name }}
+        git push --force rad ${{ github.ref_name }}
         
         echo "Ensuring sync with the network"
         rad sync --announce --timeout 180
