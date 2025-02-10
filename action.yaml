@@ -121,8 +121,8 @@ runs:
       run: |
         git push --force rad ${{ github.ref_name }}
         
-        echo "Ensuring sync with the network"
-        rad sync --announce --timeout 180
+        echo "Sync with the network"
+        rad sync --announce --timeout 60 || true
         
         rad node stop
 
