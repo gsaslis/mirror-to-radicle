@@ -112,14 +112,14 @@ runs:
         git remote add github ${GH_REPO_URL}
         git remote -v
         git fetch --all
-        git checkout -b ${{ github.ref_name }} --track github/${{ github.ref_name }}
+        git checkout -b github/${{ github.ref_name }} --track github/${{ github.ref_name }}
         
 
     - name: Push to Radicle Network
       shell: bash
       working-directory: ${{ github.workspace }}/${{ inputs.radicle-project-name }}
       run: |
-        git push --force rad ${{ github.ref_name }}
+        git push --force rad github/${{ github.ref_name }}:${{ github.ref_name }}
         
         echo "Sync with the network"
         rad sync --announce --timeout 60 || true
