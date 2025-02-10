@@ -4,7 +4,13 @@ A GitHub Action that mirrors your code to the peer-to-peer Radicle code hosting 
 
 ## Why? 
 
-//todo
+In case you have been feeling more and more uncomfortable with the idea that all the world's Open Source Software is being 
+hosted on a single platform, there is now an alternative! 
+
+The [Radicle](https://radicle.xyz) peer-to-peer network now allows you to host your code in a decentralized manner, with 
+universal discoverability. For more details about Radicle, you can check out the various [Guides](https://radicle.xyz/guides). 
+
+Start mirroring your code to Radicle!  ✊
 
 ## Usage 
 
@@ -213,4 +219,76 @@ You are now ready to set up this GitHub action! See next section below
 
 ### 5. Add this GitHub Action to your repo 
 
-// todo
+Once the setup above has been completed, you will have all the necessary information to set up this GitHub Action
+on your repo and start mirroring to Radicle. 
+
+#### Add the necessary secrets
+
+If you plan on mirroring multiple repositories to Radicle, it is best if you set up the Radicle identity you created
+as the GitHub Actions machine account under [Environment Secrets](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment#environment-secrets), after creating a new Environment (e.g. `radicle`). 
+
+You can then configure each mirrored project to re-use this environment by going to `https://github.com/$github_user_or_org/$project/settings/environments` and setting the environment there. 
+
+Within this environment, you will need to create 4 secrets: 
+
+- `RADICLE_IDENTITY_ALIAS`: the alias you used when creating the GitHub Actions machine account. In the example above, 
+this was `yorgos_actions`. 
+- `RADICLE_IDENTITY_PASSPHRASE`: the passphrase you used to protect the private key of the GitHub Actions machine account. 
+- `RADICLE_IDENTITY_PRIVATE_KEY`: the **base64-encoded format** of the private key of the GitHub Actions machine account. You 
+can get this with, e.g. `cat ~/.radicle_actions/keys/radicle | base64`
+- `RADICLE_IDENTITY_PUBLIC_KEY`: the **base64-encoded format** of the public key of the GitHub Actions machine account. You 
+can get this with, e.g. `cat ~/.radicle_actions/keys/radicle.pub | base64`
+
+<img src="/assets/github_environment_with_secrets.png" alt="Prefer Environment secrets, so you can reuse your machine account on other projects" width="400">
+
+
+Once those are set up, head on over to your project's Actions Secrets and create the remaining 2 secrets:
+
+- `RADICLE_PROJECT_NAME`: the project name you assigned to this project when you ran `rad init`,
+- `RADICLE_REPOSITORY_ID`: the repository id that you got after you created.
+
+<img src="/assets/github_project_actions_secrets.png" alt="The Secrets on your project settings" width="400">
+
+#### Add the GitHub Actions workflow
+
+As the final step, you'll need to create a new workflow in `.github/workflows/`
+
+```yaml
+name: Mirror to Radicle
+
+# Controls when the workflow will run
+on:
+  push:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - id: mirror
+        uses: gsaslis/mirror-to-radicle@v0.1.0
+        with:
+          radicle-identity-alias: "${{ secrets.RADICLE_IDENTITY_ALIAS }}"
+          radicle-identity-passphrase: "${{ secrets.RADICLE_IDENTITY_PASSPHRASE }}"
+          radicle-identity-private-key: "${{ secrets.RADICLE_IDENTITY_PRIVATE_KEY }}"
+          radicle-identity-public-key: "${{ secrets.RADICLE_IDENTITY_PUBLIC_KEY }}"
+          radicle-project-name: "${{ secrets.RADICLE_PROJECT_NAME }}"
+          radicle-repository-id: "${{ secrets.RADICLE_REPOSITORY_ID }}"
+```
+
+### Verify it worked
+
+After the job has run successfully, you can try visiting: 
+https://app.radicle.xyz/seeds/ash.radicle.garden/$radicle-repository-id to browse your repository on Radicle!  
+
+`ash.radicle.garden` is just one of the permissive nodes seeding content to support the Radicle network. Please 
+feel free to consider 
+
+## Contributing
+
+Please feel free to join the [Radicle zulip chat](https://radicle.zulipchat.com/#narrow/channel/369873-support) 
+if you are interested in trying this out and have some questions.  
