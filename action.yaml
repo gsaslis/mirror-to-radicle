@@ -37,6 +37,7 @@ runs:
     - name: Install radicle-cli
       env:
         RAD_HOME: ${{ github.workspace }}/.radicle
+      shell: bash
       run: |
         curl --show-error --silent --fail https://radicle.xyz/install | sh
         echo "RAD_HOME=${{ github.workspace }}/.radicle" >> $GITHUB_ENV
@@ -44,10 +45,12 @@ runs:
         echo "${RAD_HOME}/bin" >> $GITHUB_PATH
 
     - name: Install helper packages
+      shell: bash
       run: |
         sudo apt-get -y install socat
 
     - name: Setup Radicle Identity & Node
+      shell: bash
       run: |          
         echo "Home: $HOME"
         rad --version          
@@ -57,6 +60,7 @@ runs:
         rad auth 
 
     - name: Start Radicle Node
+      shell: bash
       run: |          
         rad config unset preferredSeeds
         rad config 
@@ -75,6 +79,7 @@ runs:
         done
 
     - name: Wait for Node to connect to peers
+      shell: bash
       run: |          
         max_retry=30
         counter=0
@@ -91,10 +96,12 @@ runs:
 
 
     - name: Clone from Radicle
+      shell: bash
       run: |
         rad clone "${{ inputs.radicle-repository-id }}" --no-confirm
 
     - name: Fetch code from GitHub
+      shell: bash
       working-directory: ${{ github.workspace }}/${{ inputs.radicle-project-name }}
       run: |
         
@@ -109,6 +116,7 @@ runs:
         
 
     - name: Push to Radicle Network
+      shell: bash
       working-directory: ${{ github.workspace }}/${{ inputs.radicle-project-name }}
       run: |
         git push rad ${{ github.ref_name }}
