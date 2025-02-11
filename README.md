@@ -32,18 +32,34 @@ Here is the bird's eye view:
 1. Set up _machine account_ for continuous mirroring
 1. Use this GitHub Action on your project
 
-Here goes:
+> [!TIP]
+> Each section below has a collapsible section you can expand 
+> by clicking on the title (and then collapse in the same way), 
+> so it is easier to track the steps of
+> the guide. 
 
-### 1. Install `rad` Command Line Interface tool.
 
-Visit [this page](https://radicle.xyz/guides/user#installation) for
-other installation instructions.
+### 1. Install `rad` Command Line Interface tool
+
+<details>
+  <summary>Expand for instructions</summary>
+
+This can be as easy as:
 
 ```shell
 curl -sSf https://radicle.xyz/install | sh
 ```
 
+Or visit [this page](https://radicle.xyz/guides/user#installation) for
+other installation instructions.
+
+</details>
+
 ### 2. Create your Radicle Identity
+
+<details>
+  <summary>Expand for instructions</summary>
+
 
 Feel free to skip this step if you have previously created one.
 
@@ -88,7 +104,14 @@ commits signed by your key in the Radicle network, it's really you.
 
 _Of course, this implies trust in Microsoft / GitHub._
 
+</details>
+
+
+
 ### 3. Publish your project on Radicle !
+
+<details>
+  <summary>Expand for instructions</summary>
 
 In order to publish your project to Radicle, you'll need to start a Radicle
 node on your machine, so that it can let other nodes in the network know
@@ -158,9 +181,12 @@ browse your repository on Radicle!
 seed node](https://radicle.xyz/guides/seeder#running-your-node) to ensure
 your project remains seeded.
 
-
+</details>
 
 ### 4. Set up _machine account_ for continuous mirroring
+
+<details>
+  <summary>Expand for instructions</summary>
 
 **Machine Account creation**
 
@@ -255,13 +281,18 @@ rad sync
 
 You are now ready to set up this GitHub action! See next section below 👇 
 
+</details>
+
 ### 5. Add this GitHub Action to your repo
 
 Once the setup above has been completed, you will have all the necessary
 information to set up this GitHub Action
 on your repo and start mirroring to Radicle.
 
-#### Add the necessary secrets
+#### a. Add the necessary secrets
+
+<details>
+  <summary>Expand for instructions</summary>
 
 With the GitHub CLI: 
 
@@ -276,7 +307,8 @@ gh secret set RADICLE_IDENTITY_PUBLIC_KEY --env radicle < cat ~/.radicle_actions
 ```
 
 <details>
-  <summary>Click to show manual setup, if you prefer not to use the GitHub CLI</summary>
+  <summary>... or click here to expand the <b>manual setup</b> steps, if you 
+  prefer not to use the GitHub CLI</summary>
 
 First, create the necessary `Environment` (e.g. a new one, called `radicle`),  
 by visiting the below URL:
@@ -328,7 +360,12 @@ create the remaining 2 secrets:
 
 </details>
 
-#### Add the GitHub Actions workflow
+</details>
+
+#### b. Add the GitHub Actions workflow
+
+<details>
+  <summary>Expand for instructions</summary>
 
 As the final step, you'll need to create a new file in your project's 
 `.github/workflows/` folder - say `.github/workflows/radicle.yaml` - to store
@@ -388,8 +425,12 @@ installed:
 gh pr create --fill
 ```
 
+</details>
 
 ### Verify it worked
+
+<details>
+  <summary>Expand for instructions</summary>
 
 You should now be able to open the PR, visit the Checks tab and check whether
 the job has run successfully. 
@@ -406,6 +447,8 @@ should be able to see even this latest
 > [!TIP]
 > Reach out to us on Zulip (see below), if you'd like to have your repos 
 > seeded by an additional node (gratis! ;) ).  
+
+</details>
 
 ## Contributing
 
