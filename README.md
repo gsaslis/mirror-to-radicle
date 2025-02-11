@@ -11,8 +11,8 @@ the world's Open Source Software is being
 hosted on a single platform, there is now an alternative!
 
 The [Radicle](https://radicle.xyz) peer-to-peer network now allows you to host
-your code in a decentralized manner, with
-universal discoverability. For more details about Radicle, you can check out the
+your code in a decentralized manner. Everyone participating in this network can
+then download your code! For more details about Radicle, you can check out the
 various [Guides](https://radicle.xyz/guides).
 
 Start mirroring your code to Radicle!  ✊
@@ -103,28 +103,13 @@ $ rad node status
 $ rad node start 
 ```
 
-For more details on starting your node, see the
-[User Guide](https://radicle.xyz/guides/user#operate-nodes-smoothly).
+If this doesn't work, or if you need more details on starting your node, 
+see the [User Guide](https://radicle.xyz/guides/user#operate-nodes-smoothly).
 
 Once your node is running, and it has connected to other nodes, you can go
-ahead and announce your project!
+ahead and publish your project, by announcing it to the network! 
 
-> [!TIP]
-> **A Note on _Keeping_ your project online:** One of the nice
-> things with Radicle is that peers can run nodes with a _permissive_
-[policy](https://radicle.xyz/guides/seeder#a-permissive-seeding-policy), to
-> help support the health of the network and the overall availability of
-> Open Source Software (OSS) to the world at large.
-> As long as a single permissive node exists on the network, you
-> can rest assured that your project will be available to everyone else on the
-> network. The more permissive nodes there are, the greater the resilience and
-> availability of your project will be.
-> 
->If you don't want / can't rely on permissive nodes, you can also [run your own
-seed node](https://radicle.xyz/guides/seeder#running-your-node) to ensure
-your project remains seeded.
-
-Here is how to initialise your Radicle project and announce it to the network:
+Here is an example, publishing this very repo: 
 
 ```shell
 $ git clone https://github.com/gsaslis/mirror-to-radicle
@@ -151,6 +136,30 @@ You can show it any time by running `rad .` from this directory.
 Your repository has been synced to the network and is now discoverable by peers.
 ```
 
+You should already be able to see that some permissive nodes are seeding your
+project! Try visiting the below URL, replacing `$radicle-repository-id` 
+for your own: 
+
+`https://app.radicle.xyz/seeds/ash.radicle.garden/$radicle-repository-id` and
+browse your repository on Radicle!
+
+> [!TIP]
+> **A Note on _Keeping_ your project online:** One of the nice
+> things with Radicle is that peers can run nodes with a _permissive_
+[policy](https://radicle.xyz/guides/seeder#a-permissive-seeding-policy), to
+> help support the health of the network and the overall availability of
+> Open Source Software (OSS) to the world at large.
+> As long as a single permissive node exists on the network, you
+> can rest assured that your project will be available to everyone else on the
+> network. The more permissive nodes there are, the greater the resilience and
+> availability of your project will be.
+> 
+>If you don't want / can't rely on permissive nodes, you can also [run your own
+seed node](https://radicle.xyz/guides/seeder#running-your-node) to ensure
+your project remains seeded.
+
+
+
 ### 4. Set up _machine account_ for continuous mirroring
 
 **Machine Account creation**
@@ -162,13 +171,14 @@ In Radicle, all code is signed by a private key. When you push your code to
 GitHub, your commits may or may not be signed by a private key. However,
 for them to be pushed to Radicle, they must be signed by a Radicle identity.
 
-You already created a Radicle identity to publish your project. At the time
-of writing this, all identities on Radicle are meant to be used on a
-single-device at a time. (There is a lot of work happening to improve this in
+> [!NOTE]
+> You already created a Radicle identity to publish your project. At the time
+of writing this, **all identities on Radicle are meant to be used on a
+single-device at a time**. (There is a lot of work happening to improve this in
 the future). For this reason, you should keep the keys of the identity
 you created on your laptop/desktop alone.
 
-Because this GitHub action will be running somewhere other than your laptop,
+> Because this GitHub action will be running somewhere other than your laptop,
 you need to create a 2nd Radicle identity, to be used essentially as
 a _machine account_ by GitHub Actions.
 
@@ -178,7 +188,11 @@ its data will be stored. We use `~/.radicle_actions` in the example below.
 ```shell
 $ export RAD_HOME=~/.radicle_actions
 $ rad auth
+```
 
+The output, once you fill in the form, should look something like this:
+
+```shell
 Initializing your radicle 👾 identity
 
 ✓ Enter your alias: yorgos_actions
@@ -194,13 +208,29 @@ To get a list of all commands, run `rad`.
 ```
 
 Now go ahead and seed and fork the project from the machine account, so you
-can authorize it in the next step:
+can authorize it in the next step. To do that, you first need to start the 
+node with the machine account identity:
 
 ```shell
+# you can run this in any path, you don't have to be in a specific folder 
 $ export RAD_HOME=~/.radicle_actions
-rad seed rad:z3pN2URJoxrZSrnwKoYtWrgfS8qLL
-rad fork rad:z3pN2URJoxrZSrnwKoYtWrgfS8qLL
+# start your node so you can clone the repo and create your /storage copy/
+rad node start
 ```
+
+Now you can go ahead and proceed with the fork. Remember to use your own 
+`REPO_ID` when copy-pasting:
+
+```shell
+$ export REPO_ID=rad:z3pN2URJoxrZSrnwKoYtWrgfS8qLL
+rad clone ${REPO_ID}
+rad seed ${REPO_ID}
+# this creates your own namespace in the git refs and is required so you can be 
+# added to the project delegates 
+rad fork ${REPO_ID}
+```
+
+
 
 **Machine Account authorization**
 
@@ -213,16 +243,17 @@ created, you need a couple more bash commands:
 
 ```shell
 # Need to act as the original author of the project (so we switch RAD_HOME) 
+# This needs to run in the folder of your project
 export RAD_HOME=~/.radicle
 rad id update \
   --title "Add machine account" \
   --description "Adds machine account used by GitHub Actions for continuous mirroring" \
-  --delegate did:key:z6MkqewxVQjPk8cSNJWxjYGmwZSu8tk1cwnb3Z8mQzXNMxnF \
+  --delegate $(RAD_HOME=~/.radicle_actions rad self --did) \
   --threshold 1
 rad sync 
 ```
 
-You are now ready to set up this GitHub action! See next section below
+You are now ready to set up this GitHub action! See next section below 👇 
 
 ### 5. Add this GitHub Action to your repo
 
@@ -232,15 +263,16 @@ on your repo and start mirroring to Radicle.
 
 #### Add the necessary secrets
 
-If you plan on mirroring multiple repositories to Radicle, it is best if you set
-up the Radicle identity you created
-as the GitHub Actions machine account
-under [Environment Secrets](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment#environment-secrets),
-after creating a new Environment (e.g. `radicle`).
+First, create the necessary `Environment` (e.g. a new one, called `radicle`),  
+by visiting the below URL:
 
-You can then configure each mirrored project to re-use this environment by going
-to `https://github.com/$github_user_or_org/$project/settings/environments` and
-setting the environment there.
+`https://github.com/$github_user_or_org/$project/settings/environments`
+
+> [!WARNING]
+> If you are using GitHub Free, environment secrets are only available in 
+> public repositories, so if you're trying to mirror a private project to 
+> Radicle and you don't have this option available, you can just create 
+> ordinary Repository secrets.
 
 Within this environment, you will need to create 4 secrets:
 
@@ -248,7 +280,8 @@ Within this environment, you will need to create 4 secrets:
   machine account. In the example above,
   this was `yorgos_actions`.
 - `RADICLE_IDENTITY_PASSPHRASE`: the passphrase you used to protect the private
-  key of the GitHub Actions machine account.
+  key of the GitHub Actions machine account. In case you left the passphrase 
+  empty, you can skip this secret.
 - `RADICLE_IDENTITY_PRIVATE_KEY`: the **base64-encoded format** of the private
   key of the GitHub Actions machine account. You
   can get this with, e.g. `cat ~/.radicle_actions/keys/radicle | base64`
@@ -258,19 +291,38 @@ Within this environment, you will need to create 4 secrets:
 
 <img src="/assets/github_environment_with_secrets.png" alt="Prefer Environment secrets, so you can reuse your machine account on other projects" width="400">
 
+> [!NOTE]
+> It is also possible to create these 4 secrets as project-specific secrets, 
+> but that would require you to recreate them for each project you want to 
+> mirror to Radicle. You can find more documentation about Environment secrets
+> [here](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment#environment-secrets),
+
 
 Once those are set up, head on over to your project's Actions Secrets and create
 the remaining 2 secrets:
 
 - `RADICLE_PROJECT_NAME`: the project name you assigned to this project when you
-  ran `rad init`,
-- `RADICLE_REPOSITORY_ID`: the repository id that you got after you created.
+  ran `rad init`. You can also find this by running `rad inspect --payload` 
+  inside the folder of your radicle project. 
+- `RADICLE_REPOSITORY_ID`: the repository id that you got after you created. You
+  can also find this by running `rad .` inside the folder of your radicle 
+  project.
 
 <img src="/assets/github_project_actions_secrets.png" alt="The Secrets on your project settings" width="400">
 
 #### Add the GitHub Actions workflow
 
-As the final step, you'll need to create a new workflow in `.github/workflows/`
+As the final step, you'll need to create a new file in your project's 
+`.github/workflows/` folder - say `.github/workflows/radicle.yaml` - to store
+this new workflow:
+
+```shell
+# inside your project folder 
+mkdir -p .github/workflows
+touch .github/workflows/radicle.yaml
+```
+
+Now paste the below workflow in the file you just created:
 
 ```yaml
 name: Mirror to Radicle
@@ -299,15 +351,43 @@ jobs:
           radicle-repository-id: "${{ secrets.RADICLE_REPOSITORY_ID }}"
 ```
 
+Commit and push this code in a new branch, opening a PR so you can check whether 
+the workflow runs successfully: 
+
+```shell
+# in the folder of the cloned repo from github
+git checkout -b feat/mirror-to-radicle
+git add .github/workflows/radicle.yaml
+git commit -m 'Enable mirroring to Radicle'
+git push
+```
+
+Open a PR with this change from the GitHub web UI, or, if you have the CLI
+installed:
+
+```shell
+# in the folder of the cloned repo from github
+gh pr create --fill
+```
+
+
 ### Verify it worked
 
-After the job has run successfully, you can try visiting:
-https://app.radicle.xyz/seeds/ash.radicle.garden/$radicle-repository-id to
-browse your repository on Radicle!
+You should now be able to open the PR, visit the Checks tab and check whether
+the job has run successfully. 
 
-`ash.radicle.garden` is just one of the permissive nodes seeding content to
-support the Radicle network. Please
-feel free to consider
+If it has, you can try visiting:
+https://app.radicle.xyz/seeds/ash.radicle.garden/$radicle-repository-id and you 
+should be able to see even this latest 
+
+> [!NOTE]
+> `ash.radicle.garden` is just one of the permissive nodes seeding content to 
+> support the Radicle network. Please feel free to run your own node to seed 
+> this repo. 
+
+> [!TIP]
+> Reach out to us on Zulip (see below), if you'd like to have your repos 
+> seeded by an additional node (gratis! ;) ).  
 
 ## Contributing
 
