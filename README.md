@@ -263,6 +263,21 @@ on your repo and start mirroring to Radicle.
 
 #### Add the necessary secrets
 
+With the GitHub CLI: 
+
+```shell
+export PASSPHRASE=<THE_PASSPHRASE_YOU_FILLED_IN_WHEN_CREATING_THE_MACHINE_ACCOUNT>
+export RAD_HOME=~/.radicle_actions
+gh secret set RADICLE_IDENTITY_ALIAS --env radicle <  rad self --alias
+gh secret set RADICLE_IDENTITY_PASSPHRASE --env radicle < ${PASSPHRASE}
+gh secret set RADICLE_IDENTITY_PRIVATE_KEY --env radicle < cat ~/.radicle_actions/keys/radicle | base64
+gh secret set RADICLE_IDENTITY_PUBLIC_KEY --env radicle < cat ~/.radicle_actions/keys/radicle.pub | base64
+
+```
+
+<details>
+  <summary>Click to show manual setup, if you prefer not to use the GitHub CLI</summary>
+
 First, create the necessary `Environment` (e.g. a new one, called `radicle`),  
 by visiting the below URL:
 
@@ -298,8 +313,11 @@ Within this environment, you will need to create 4 secrets:
 > [here](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment#environment-secrets),
 
 
-Once those are set up, head on over to your project's Actions Secrets and create
-the remaining 2 secrets:
+Once those are set up, run, head on over to your project's Actions Secrets and 
+create the remaining 2 secrets:
+
+<img src="/assets/github_project_actions_secrets.png" alt="The Secrets on your project settings" width="400">
+
 
 - `RADICLE_PROJECT_NAME`: the project name you assigned to this project when you
   ran `rad init`. You can also find this by running `rad inspect --payload` 
@@ -308,7 +326,7 @@ the remaining 2 secrets:
   can also find this by running `rad .` inside the folder of your radicle 
   project.
 
-<img src="/assets/github_project_actions_secrets.png" alt="The Secrets on your project settings" width="400">
+</details>
 
 #### Add the GitHub Actions workflow
 
