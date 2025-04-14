@@ -92,6 +92,15 @@ runs:
         done
         
         rad node status
+        
+        echo "Now allow node to catch up with the network... Waiting:"
+        
+        for i in {1..60}; do
+          echo -n "."
+          sleep 1
+        done
+        
+        echo  
 
 
 
