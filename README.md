@@ -385,6 +385,8 @@ name: Mirror to Radicle
 # Controls when the workflow will run
 on:
   push:
+    branches:
+      - main
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
