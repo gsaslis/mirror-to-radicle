@@ -107,7 +107,7 @@ runs:
     - name: Clone from Radicle
       shell: bash
       run: |
-        rad clone "${{ inputs.radicle-repository-id }}" --no-confirm --timeout 180
+        rad clone "${{ inputs.radicle-repository-id }}" --no-confirm --timeout 180sec
 
     - name: Fetch code from GitHub
       shell: bash
@@ -131,7 +131,7 @@ runs:
         git push --force rad github/${{ github.ref_name }}:${{ github.ref_name }}
         
         echo "Sync with the network"
-        rad sync --announce --timeout 60 || true
+        rad sync --announce --timeout 60sec || true
         
         rad node stop
 
