@@ -10,10 +10,10 @@ In case you have been feeling more and more uncomfortable with the idea that all
 the world's Open Source Software is being
 hosted on a single platform, there is now an alternative!
 
-The [Radicle](https://radicle.xyz) peer-to-peer network now allows you to host
+The [Radicle](https://radicle.dev) peer-to-peer network now allows you to host
 your code in a decentralized manner. Everyone participating in this network can
 then download your code! For more details about Radicle, you can check out the
-various [Guides](https://radicle.xyz/guides).
+various [Guides](https://radicle.dev/guides).
 
 Start mirroring your code to Radicle!  ✊
 
@@ -47,10 +47,10 @@ Here is the bird's eye view:
 This can be as easy as:
 
 ```shell
-curl -sSf https://radicle.xyz/install | sh
+curl -sSf https://radicle.dev/install | sh
 ```
 
-Or visit [this page](https://radicle.xyz/guides/user#installation) for
+Or visit [this page](https://radicle.dev/guides/user#installation) for
 other installation instructions.
 
 </details>
@@ -94,7 +94,7 @@ newly-created identity:
 
 - run `rad self --did` and use the output in place of `$your_did_key` below
 - Enter the following URL:
-  `https://app.radicle.xyz/seeds/seed.radicle.garden/users/$your_did_key`
+  `https://app.radicle.dev/seeds/seed.radicle.garden/users/$your_did_key`
 
 This will add a an `<a rel="me">` link on your github.com/$username page,
 allowing everyone to _verify_ this is indeed your own key.
@@ -127,7 +127,7 @@ $ rad node start
 ```
 
 If this doesn't work, or if you need more details on starting your node, 
-see the [User Guide](https://radicle.xyz/guides/user#operate-nodes-smoothly).
+see the [User Guide](https://radicle.dev/guides/user#operate-nodes-smoothly).
 
 Once your node is running, and it has connected to other nodes, you can go
 ahead and publish your project, by announcing it to the network! 
@@ -163,13 +163,13 @@ You should already be able to see that some permissive nodes are seeding your
 project! Try visiting the below URL, replacing `$radicle-repository-id` 
 for your own: 
 
-`https://app.radicle.xyz/seeds/ash.radicle.garden/$radicle-repository-id` and
+`https://app.radicle.dev/seeds/ash.radicle.garden/$radicle-repository-id` and
 browse your repository on Radicle!
 
 > [!TIP]
 > **A Note on _Keeping_ your project online:** One of the nice
 > things with Radicle is that peers can run nodes with a _permissive_
-[policy](https://radicle.xyz/guides/seeder#a-permissive-seeding-policy), to
+[policy](https://radicle.dev/guides/seeder#a-permissive-seeding-policy), to
 > help support the health of the network and the overall availability of
 > Open Source Software (OSS) to the world at large.
 > As long as a single permissive node exists on the network, you
@@ -178,7 +178,7 @@ browse your repository on Radicle!
 > availability of your project will be.
 > 
 >If you don't want / can't rely on permissive nodes, you can also [run your own
-seed node](https://radicle.xyz/guides/seeder#running-your-node) to ensure
+seed node](https://radicle.dev/guides/seeder#running-your-node) to ensure
 your project remains seeded.
 
 </details>
@@ -436,7 +436,7 @@ You should now be able to open the PR, visit the Checks tab and check whether
 the job has run successfully. 
 
 If it has, you can try visiting:
-https://app.radicle.xyz/seeds/ash.radicle.garden/$radicle-repository-id and you 
+https://app.radicle.dev/seeds/ash.radicle.garden/$radicle-repository-id and you 
 should be able to see even this latest 
 
 > [!NOTE]

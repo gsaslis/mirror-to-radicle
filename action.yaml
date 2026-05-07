@@ -39,7 +39,7 @@ runs:
         RAD_HOME: ${{ github.workspace }}/.radicle
       shell: bash
       run: |
-        curl --show-error --silent --fail https://radicle.xyz/install | sh
+        curl --show-error --silent --fail --location https://radicle.dev/install | sh
         echo "RAD_HOME=${{ github.workspace }}/.radicle" >> $GITHUB_ENV
         echo "RAD_PASSPHRASE=${{ inputs.radicle-identity-passphrase }}" >> $GITHUB_ENV
         echo "${RAD_HOME}/bin" >> $GITHUB_PATH
