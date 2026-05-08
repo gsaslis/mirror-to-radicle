@@ -1,0 +1,22 @@
+name: Mirror to Radicle
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    environment: radicle
+    steps:
+      - uses: actions/checkout@v6
+      - id: mirror
+        uses: ./
+        with:
+          radicle-identity-alias: "${{ secrets.RADICLE_IDENTITY_ALIAS }}"
+          radicle-identity-passphrase: "${{ secrets.RADICLE_IDENTITY_PASSPHRASE }}"
+          radicle-identity-private-key: "${{ secrets.RADICLE_IDENTITY_PRIVATE_KEY }}"
+          radicle-identity-public-key: "${{ secrets.RADICLE_IDENTITY_PUBLIC_KEY }}"
+          radicle-project-name: mirror-to-radicle
+          radicle-repository-id: rad:z3pN2URJoxrZSrnwKoYtWrgfS8qLL
